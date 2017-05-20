@@ -1,0 +1,12 @@
+<h3 class="page-header">All projects</h3>
+
+
+<table class="table table-striped" border="1">
+
+    <tr th:each="project : ${projects}">
+        <td th:text="${project.id}">1</td>
+        <td><a th:href="@{/project/view(id=${project.id})}" th:text="${project.name}">Edit</a></td>
+        <td th:text="${project.description}">Text ...</td>
+    </tr>
+
+</table>
