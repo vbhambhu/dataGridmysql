@@ -14,7 +14,6 @@ public interface ProjectRepository extends CrudRepository<Project, Long> {
 
     Page<Project> findAll(Pageable pageRequest);
 
-
     Project findById(Long id);
 
 

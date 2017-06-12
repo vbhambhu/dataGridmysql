@@ -1,2 +1,11 @@
 <h3 class="page-header" th:text="${project.name}">All projects</h3>
 
+<table class="table table-striped" border="1">
+
+    <tr th:each="form : ${forms}">
+        <td th:text="${form.id}">1</td>
+        <td><a th:href="@{/form/view(id=${form.id})}" th:text="${form.name}">Edit</a></td>
+        <td th:text="${form.description}">Text ...</td>
+    </tr>
+
+</table>

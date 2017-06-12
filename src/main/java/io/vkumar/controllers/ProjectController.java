@@ -1,6 +1,8 @@
 package io.vkumar.controllers;
 
+import io.vkumar.entities.Form;
 import io.vkumar.entities.Project;
+import io.vkumar.services.FormService;
 import io.vkumar.services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,11 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private FormService formService;
 
 
     @Value("${project.pageSize}")
@@ -37,6 +44,14 @@ public class ProjectController {
 
         Project project = projectService.projectById(id);
         model.addAttribute("project", project);
+
+        List<Form> forms = formService.findFormsByProjectId(id);
+        model.addAttribute("forms", forms);
+//
+
+        //List<Form> forms = formService.formByFormId(1);
+
+
         return "projects/index";
 
     }

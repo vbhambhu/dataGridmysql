@@ -1,0 +1,10 @@
+<h3 class="page-header" th:text="${form.name}">{formname}</h3>
+
+<table class="table table-striped" border="1">
+
+    <tr th:each="field : ${fields}">
+        <td th:text="${field.id}">1</td>
+        <td th:text="${field.label}">Text ...</td>
+    </tr>
+
+</table>
