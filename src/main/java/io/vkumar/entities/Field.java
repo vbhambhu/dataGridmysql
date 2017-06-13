@@ -1,20 +1,33 @@
 package io.vkumar.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "fields")
 public class Field {
 
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Long id;
 
-    private String label;
-    private String type;
-    private int position;
-    private Long formId;
+    public String identifier;
+    public String label;
+    public String type;
+    public int position;
+    public Long formId;
+    public String defaultValue;
+
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "fieldId")
+    public List<Option> options = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "fieldId")
+    public List<Validation> validations = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -54,5 +67,29 @@ public class Field {
 
     public void setFormId(Long formId) {
         this.formId = formId;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public List<Option> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<Option> options) {
+        this.options = options;
     }
 }

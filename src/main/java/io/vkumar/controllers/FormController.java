@@ -3,6 +3,7 @@ package io.vkumar.controllers;
 
 import io.vkumar.entities.Field;
 import io.vkumar.entities.Form;
+import io.vkumar.entities.Option;
 import io.vkumar.services.FormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,16 +22,22 @@ public class FormController {
     @Autowired
     private FormService formService;
 
-    @RequestMapping(value="/form/view", method= RequestMethod.GET)
+    @RequestMapping(value="/form/view", method = { RequestMethod.GET, RequestMethod.POST })
     public String showform(@RequestParam("id") Long id, Model model) {
 
         Form form = formService.formById(id);
-        model.addAttribute("form", form);
         List<Field> fields = formService.findFieldsByFormId(id);
+
+
+
+        model.addAttribute("form", form);
         model.addAttribute("fields", fields);
+
         return "forms/index";
 
     }
+
+
 
 
 

@@ -1,10 +1,67 @@
 <h3 class="page-header" th:text="${form.name}">{formname}</h3>
 
-<table class="table table-striped" border="1">
+<form method="post"  enctype="multipart/form-data">
 
-    <tr th:each="field : ${fields}">
-        <td th:text="${field.id}">1</td>
-        <td th:text="${field.label}">Text ...</td>
-    </tr>
+    <div th:each="field : ${fields}">
 
-</table>
+
+        <label th:text="${field.label}">{label}</label>
+
+        <span  th:switch="${field.type}">
+
+            <span th:case="'text'">
+                <input type="text"  th:name="${field.identifier}" th:value="${field.defaultValue}" class="form-control"/>
+            </span>
+
+            <span th:case="'textarea'">
+                <textarea class="form-control" th:name="${field.identifier}"></textarea>
+            </span>
+
+
+            <span th:case="'select'">
+                <select class="form-control" th:name="${field.identifier}">
+                    <option th:each="option : ${field.options}"
+                            th:value="${option.ovalue}"
+                            th:text="${option.okey}">{option}</option>
+                </select>
+            </span>
+
+
+            <span th:case="'radio'">
+                <div th:each="option : ${field.options}">
+                    <label class="form-check-label">
+                    <input type="radio" class="form-check-input" th:name="${field.identifier}" th:value="${option.okey}"/>
+                        <span th:text="${option.ovalue}"></span>
+                    </label>
+                </div>
+            </span>
+
+
+            <span th:case="'check'">
+                 <div th:each="option : ${field.options}">
+                    <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" th:name="${field.identifier}"/>
+                        <span th:text="${option.ovalue}"></span>
+                    </label>
+                </div>
+            </span>
+
+            <span th:case="'fileUpload'">
+                <input type="file"/>
+            </span>
+
+            <span th:case="'calculated'">
+                <input type="text"/>
+            </span>
+
+            <span th:case="'dquery'">
+                <input type="file"/>
+            </span>
+
+
+        </span>
+
+    </div>
+    <input type="submit" value="Save" class="btn btn-success" />
+
+</form>
