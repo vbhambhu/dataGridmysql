@@ -19,15 +19,14 @@ public class Field {
     public int position;
     public Long formId;
     public String defaultValue;
+    public String validations;
 
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "fieldId")
     public List<Option> options = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "fieldId")
-    public List<Validation> validations = new ArrayList<>();
+
 
     public Long getId() {
         return id;
@@ -91,5 +90,13 @@ public class Field {
 
     public void setOptions(List<Option> options) {
         this.options = options;
+    }
+
+    public String getValidations() {
+        return validations;
+    }
+
+    public void setValidations(String validations) {
+        this.validations = validations;
     }
 }

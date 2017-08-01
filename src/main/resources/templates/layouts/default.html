@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="bookIt">
+<head th:replace="fragments/header :: head"></head>
+<body>
+<div class="container">
+
+    <div th:replace="fragments/header :: menu">
+        {menu}
+    </div>
+
+    <!-- page content -->
+    <div layout:fragment="content">
+        {content}
+    </div>
+    <!--  footer -->
+    <div th:replace="fragments/footer :: footer">
+        {footer}
+    </div> <!-- //footer -->
+</div> <!-- //container-fluid -->
+</body>
+</html>
