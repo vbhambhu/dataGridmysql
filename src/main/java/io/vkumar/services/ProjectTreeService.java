@@ -25,8 +25,9 @@ public class ProjectTreeService {
 
     public List<ProjectTree> getFolderTree(int userId, int projectId, int folderId) {
 
-        String sqlString = "SELECT fa.id,fa.name, (select count(*) from folders fb where fb.parent_id=fa.id) as child_count FROM folders fa where project_id = "+projectId+" and fa.parent_id="+folderId;
+       // String sqlString = "SELECT fa.id,fa.name, (select count(*) from folders fb where fb.parent_id=fa.id) as child_count FROM folders fa where project_id = "+projectId+" and fa.parent_id="+folderId;
 
+        String sqlString = "SELECT fa.id,fa.name, (select count(*) from folders fb where fb.parent_id=fa.id) + (select count(*) from sheets sh where sh.folder_id=fa.id) as child_count FROM folders fa where project_id = 1 and fa.parent_id="+folderId;
         System.out.println(sqlString);
 
         List<ProjectTree> projectTrees = jdbcTemplate.query(sqlString, new BeanPropertyRowMapper<ProjectTree>(ProjectTree.class));

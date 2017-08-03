@@ -1,9 +1,12 @@
 package io.vkumar.controllers;
 
 import io.vkumar.entities.Category;
+import io.vkumar.entities.DatatableRequest;
+import io.vkumar.entities.DatatableResponse;
 import io.vkumar.entities.ProjectTree;
 import io.vkumar.services.CategoryService;
 import io.vkumar.services.ProjectTreeService;
+import io.vkumar.services.SheetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +23,26 @@ public class AjaxController {
 
     @Autowired
     ProjectTreeService projectTreeService;
+
+    @Autowired
+    SheetService sheetService;
+
+    @ResponseBody
+    @RequestMapping(value="/api/getHeaders", method= RequestMethod.POST)
+    public String[] getSheetHeader() {
+
+        return sheetService.getSheetHeader();
+
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value="/api/viewDatatable", method= RequestMethod.POST)
+    public DatatableResponse getBucket(DatatableRequest datatableRequest) {
+
+        DatatableResponse datatableResponse = sheetService.getView(datatableRequest);
+        return datatableResponse;
+    }
 
 
     @ResponseBody

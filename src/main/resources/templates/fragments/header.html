@@ -6,6 +6,8 @@
     <meta content="ie=edge" http-equiv="x-ua-compatible" />
     <title th:text="${metaTitle} ? ${metaTitle} : 'dynForms' "></title>
     <link rel="stylesheet" href="/css/entireframework.min.css"/>
+    <link rel="stylesheet" href="/css/font-awesome.min.css"/>
+
     <link th:each="css : ${cssFiles}" rel="stylesheet" th:href="@{/css/} + ${css}" />
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
