@@ -1,48 +1,44 @@
 var tableName= '#datatable';
-
+var columns = new Array();
 
 $.post( "api/getHeaders", function( data ) {
-    console.log( data );
-
 
 
     $.each(data, function (k, colObj) {
-        str = '<th>' + colObj + '</th>';
+        str = '<th>' + colObj.colLabel + '</th>';
         $(str).appendTo(tableName+'>thead>tr');
+        columns.push({"data": colObj.colName});
     });
 
-
-
-
-
-
 }).done(function( data ) {
+
+    console.log("=====DT=======");
 
     var dtable = $(tableName).DataTable( {
         "processing": true,
         "serverSide": true,
+        "lengthMenu": [[15, 25, 50], [15, 25, 50,]],
+        "pageLength": 15,
         //"rowId": 'staffId',
         "ajax":{
             "url": "api/viewDatatable",
-            "type": "POST",
-            "success": function ( d ) {
-                console.log(d);
-            }
+            "type": "POST"
         },
+        "columns": columns,
         'createdRow': function( row, data, dataIndex ) {
-            $(row).attr('id', data[0]);
+            //$(row).attr('id', data[0]);
         },
         "columnDefs": [{
             "className": "tblCell",
             "targets": '_all',
             'createdCell':  function (td, cellData, rowData, row, col) {
-                $(td).attr('id', col);
+                //$(td).attr('id', col);
             }
         },
             {
-                "targets": [ 0 ],
-                "visible": true,
-                "searchable": false
+               // "targets": [ 0 ],
+               // "visible": true,
+               // "searchable": true
             }
         ],
         "initComplete": function(settings, json) {

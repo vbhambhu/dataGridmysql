@@ -1,24 +1,21 @@
 package io.vkumar.controllers;
 
-import io.vkumar.entities.Category;
-import io.vkumar.entities.DatatableRequest;
-import io.vkumar.entities.DatatableResponse;
-import io.vkumar.entities.ProjectTree;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vkumar.entities.*;
 import io.vkumar.services.CategoryService;
 import io.vkumar.services.ProjectTreeService;
 import io.vkumar.services.SheetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
-@Controller
+@RestController
 public class AjaxController {
 
     @Autowired
@@ -29,20 +26,43 @@ public class AjaxController {
 
     @ResponseBody
     @RequestMapping(value="/api/getHeaders", method= RequestMethod.POST)
-    public String[] getSheetHeader() {
+    public List<MetaData> getSheetHeader() {
 
         return sheetService.getSheetHeader();
 
     }
 
 
-    @ResponseBody
+
     @RequestMapping(value="/api/viewDatatable", method= RequestMethod.POST)
     public DatatableResponse getBucket(DatatableRequest datatableRequest) {
 
-        DatatableResponse datatableResponse = sheetService.getView(datatableRequest);
+        ObjectMapper mapper = new ObjectMapper();
+
+
+       DatatableResponse datatableResponse =  sheetService.getView(datatableRequest);
+
+//        try {
+//            String jsonInString = mapper.writeValueAsString(datatableResponse);
+//            System.out.println(jsonInString);
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//        }
+
+
         return datatableResponse;
+
     }
+
+
+
+
+
+
+
+
+
+
 
 
     @ResponseBody
