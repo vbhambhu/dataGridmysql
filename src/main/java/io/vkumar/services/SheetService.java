@@ -24,18 +24,108 @@ public class SheetService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+
+    public DatatableResponse getJimView(DatatableRequest datatableRequest) {
+
+        int sheetId = 1;
+        int filteredRows = 0;
+
+        String cols[] = {"name","comment","date_of_birth","gender","salary", "last_seen_time", "category"};
+        String searhString = datatableRequest.getSearch().get("value").trim();
+        int colOrder = Integer.parseInt(datatableRequest.getOrder().get(0).get("column"));
+        String colOrderName = cols[colOrder];
+        String colOrderDir = datatableRequest.getOrder().get(0).get("dir");
+
+        //total
+        String totalSql = "SELECT COUNT(DISTINCT record_id) from sheet_data WHERE sheet_id = ?";
+        int totalRows = jdbcTemplate.queryForObject(totalSql,new Object[] { sheetId }, Integer.class);
+
+        //build query
+        StringBuilder builder = new StringBuilder();
+        StringBuilder filtredSql = new StringBuilder();
+
+        builder.append("SELECT record_id, group_concat(name, '::', value SEPARATOR '\n') AS data FROM sheet_data WHERE sheet_id = 1");
+
+        if(!searhString.isEmpty()){
+            builder.append(" AND record_id IN (SELECT record_id from sheet_data WHERE value Like '%"+searhString+"%') ");
+            filtredSql.append("SELECT COUNT(DISTINCT record_id) from sheet_data WHERE sheet_id = ? AND value Like '%"+searhString+"%'");
+            filteredRows = jdbcTemplate.queryForObject(filtredSql.toString(),new Object[] { sheetId }, Integer.class);
+        } else{
+            filteredRows = totalRows;
+        }
+
+        builder.append(" GROUP BY record_id ");
+
+        if(!colOrderName.isEmpty()){
+            builder.append( " ORDER BY "+ colOrderName + " "+ colOrderDir);
+        }
+
+        builder.append(" LIMIT "+datatableRequest.getStart() + ","+ datatableRequest.getLength());
+
+        System.out.println(builder.toString());
+
+        List<Map<String, Object>> ls = jdbcTemplate.queryForList(builder.toString());
+
+        List<Map<String, Object>> items = new ArrayList();
+
+        Map<String, Object> test = new HashMap<String, Object>();
+
+
+
+
+
+        for(Map<String, Object> record:ls ){
+            String data = (String) record.get("data");
+
+            String[] keyValecols = data.split("\\r?\\n");
+
+            for (String keyValecol : keyValecols){
+                test.put(keyValecol.split("::")[0], keyValecol.split("::")[1]);
+            }
+
+            items.add(test);
+
+           // System.out.println();
+
+        }
+
+
+
+
+
+
+        //SELECT record_id, group_concat(name, '=', value) from sheet_data WHERE sheet_id = 1 group by record_id
+
+
+
+        DatatableResponse datatableResponse = new DatatableResponse();
+        datatableResponse.setDraw(datatableRequest.getDraw());
+        datatableResponse.setRecordsTotal(totalRows);
+        datatableResponse.setRecordsFiltered(filteredRows);
+        datatableResponse.setData(items);
+
+        return datatableResponse;
+
+
+
+
+    }
+
     public DatatableResponse getView(DatatableRequest datatableRequest) {
 
 
         int sheetId = 1;
+        int filteredRows = 0;
 
-        String totalSql = "SELECT count(*) FROM ( SELECT COUNT(*) AS count FROM sheet_data WHERE sheet_id = ? GROUP BY record_id) AS total";
+       // String totalSql = "SELECT count(*) FROM ( SELECT COUNT(*) AS count FROM sheet_data WHERE sheet_id = ? GROUP BY record_id) AS total";
+
+        String totalSql = "SELECT COUNT(DISTINCT record_id) from sheet_data WHERE sheet_id = ?";
+
+
         int totalRows = jdbcTemplate.queryForObject(totalSql,new Object[] { sheetId }, Integer.class);
 
 
         String cols[] = {"name","comment","date_of_birth","gender","salary", "last_seen_time", "category"};
-
-
         String searhString = datatableRequest.getSearch().get("value").trim();
         int colOrder = Integer.parseInt(datatableRequest.getOrder().get(0).get("column"));
         String colOrderName = cols[colOrder];
@@ -43,6 +133,7 @@ public class SheetService {
 
         //build query
         StringBuilder builder = new StringBuilder();
+        StringBuilder filtredSql = new StringBuilder();
         builder.append("SELECT ");
 
         for(String col : cols){
@@ -53,25 +144,31 @@ public class SheetService {
             builder.append(",");
         }
 
+
+
         builder.append("record_id");
         builder.append(" FROM sheet_data WHERE sheet_id = 1 ");
 
+
         if(!searhString.isEmpty()){
             builder.append(" AND record_id IN (SELECT record_id from sheet_data WHERE value Like '%"+searhString+"%') ");
+            filtredSql.append("SELECT COUNT(DISTINCT record_id) from sheet_data WHERE sheet_id = ? AND value Like '%"+searhString+"%'");
+            filteredRows = jdbcTemplate.queryForObject(filtredSql.toString(),new Object[] { sheetId }, Integer.class);
+
+        } else{
+            filteredRows = totalRows;
         }
 
         builder.append(" GROUP BY record_id ");
 
-       // int filteredRows = jdbcTemplate.queryForObject(builder.toString(),new Object[] { sheetId }, Integer.class);
 
         if(!colOrderName.isEmpty()){
             builder.append( " ORDER BY "+ colOrderName + " "+ colOrderDir);
         }
 
-
         builder.append(" LIMIT "+datatableRequest.getStart() + ","+ datatableRequest.getLength());
 
-
+        System.out.println(builder.toString());
 
 
         List<Map<String, Object>> ls = jdbcTemplate.queryForList(builder.toString());
@@ -80,7 +177,7 @@ public class SheetService {
         DatatableResponse datatableResponse = new DatatableResponse();
         datatableResponse.setDraw(datatableRequest.getDraw());
         datatableResponse.setRecordsTotal(totalRows);
-        datatableResponse.setRecordsFiltered(1021);
+        datatableResponse.setRecordsFiltered(filteredRows);
         datatableResponse.setData(ls);
 
         return datatableResponse;

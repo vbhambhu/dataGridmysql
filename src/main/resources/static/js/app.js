@@ -3,42 +3,53 @@ var columns = new Array();
 
 $.post( "api/getHeaders", function( data ) {
 
+    //first col
+    columns.push({"data": "record_id"});
+    str = '<th>#</th>';
+    $(str).appendTo(tableName+'>thead>tr');
 
     $.each(data, function (k, colObj) {
-        str = '<th>' + colObj.colLabel + '</th>';
+        str = '<th data-itype="'+colObj.inputType+'">' + colObj.colLabel + '</th>';
         $(str).appendTo(tableName+'>thead>tr');
         columns.push({"data": colObj.colName});
     });
 
-}).done(function( data ) {
+}).done(function( dataa ) {
 
     console.log("=====DT=======");
+
+
+
+    //console.log(columns);
 
     var dtable = $(tableName).DataTable( {
         "processing": true,
         "serverSide": true,
-        "lengthMenu": [[15, 25, 50], [15, 25, 50,]],
-        "pageLength": 15,
-        //"rowId": 'staffId',
+        "lengthMenu": [[10,15, 25, 50], [10,15, 25, 50]],
+        "pageLength": 10,
         "ajax":{
             "url": "api/viewDatatable",
-            "type": "POST"
+            "type": "POST",
+            // "success": function(f){
+            //     console.log(f);
+            // }
         },
         "columns": columns,
         'createdRow': function( row, data, dataIndex ) {
-            //$(row).attr('id', data[0]);
+            $(row).attr('id', data.record_id);
         },
         "columnDefs": [{
             "className": "tblCell",
             "targets": '_all',
             'createdCell':  function (td, cellData, rowData, row, col) {
-                //$(td).attr('id', col);
+                $(td).attr('rId', rowData.record_id);
+                $(td).attr('colId', columns[col].data);
             }
         },
             {
-               // "targets": [ 0 ],
-               // "visible": true,
-               // "searchable": true
+               "targets": [ 0 ],
+                "visible": false,
+                "searchable": false
             }
         ],
         "initComplete": function(settings, json) {
@@ -46,6 +57,24 @@ $.post( "api/getHeaders", function( data ) {
             //console.log(settings);
             //initPlugins();
         }
+    });
+
+
+    $('#datatable').on( 'dblclick', 'td', function () {
+
+        var $td = $(this);
+        var currentVal = $td.text();
+        var $th = $('#datatable').find('th').eq(parseInt($td.index()));
+        var inputType = $th.data('itype');
+        var html = '';
+
+        if(inputType == 'text'){
+            html += '<input type="text" value="'+currentVal+'"  class="cellEdit">';
+            $(this).html(html);
+        }
+
+        $('.cellEdit').focus();
+
     });
 
 

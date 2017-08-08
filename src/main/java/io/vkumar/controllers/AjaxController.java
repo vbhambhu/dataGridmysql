@@ -37,32 +37,22 @@ public class AjaxController {
     @RequestMapping(value="/api/viewDatatable", method= RequestMethod.POST)
     public DatatableResponse getBucket(DatatableRequest datatableRequest) {
 
-        ObjectMapper mapper = new ObjectMapper();
+
+        long startTime = System.nanoTime();
 
 
        DatatableResponse datatableResponse =  sheetService.getView(datatableRequest);
 
-//        try {
-//            String jsonInString = mapper.writeValueAsString(datatableResponse);
-//            System.out.println(jsonInString);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
+        long endTime = System.nanoTime();
+
+        long elapsedTime = endTime - startTime;
+        double seconds = (double)elapsedTime / 1000000000.0;
+        System.out.println("Took "+seconds + " secs");
 
 
         return datatableResponse;
 
     }
-
-
-
-
-
-
-
-
-
-
 
 
     @ResponseBody
