@@ -4,11 +4,10 @@ package io.vkumar.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.vkumar.entities.DatatableRequest;
-import io.vkumar.entities.DatatableResponse;
-import io.vkumar.entities.MetaData;
-import io.vkumar.entities.SheetData;
+import io.vkumar.Helpers.FormValidation;
+import io.vkumar.entities.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.spel.ast.FormatHelper;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -168,7 +167,7 @@ public class SheetService {
 
         builder.append(" LIMIT "+datatableRequest.getStart() + ","+ datatableRequest.getLength());
 
-        System.out.println(builder.toString());
+        //System.out.println(builder.toString());
 
 
         List<Map<String, Object>> ls = jdbcTemplate.queryForList(builder.toString());
@@ -194,5 +193,49 @@ public class SheetService {
         List<MetaData> metaData = jdbcTemplate.query(sqlString,new Object[] { sheetId }, new BeanPropertyRowMapper<MetaData>(MetaData.class));
 
         return metaData;
+    }
+
+    public Boolean saveSheet(int rowId, String colId, String newVal) {
+
+        int sheetId = 1;
+
+        //get validation rule here
+        String metaSql = "SELECT validations FROM meta_data WHERE sheet_id=? AND col_name=?";
+
+        MetaData metaData = jdbcTemplate.queryForObject(metaSql, new Object[] { sheetId, colId }, new BeanPropertyRowMapper<MetaData>(MetaData.class));
+
+        //System.out.println(metaData.getValidations());
+
+        FormValidation.validate(newVal, metaData.getValidations());
+
+
+        String SQL = "UPDATE sheet_data SET value = ? WHERE sheet_id=? AND record_id = ? AND name=?";
+        jdbcTemplate.update(SQL, newVal,sheetId,rowId,colId );
+
+        return true;
+
+
+    }
+
+    public List<Option> getOptions(String optionKey) {
+
+        String sqlString = "SELECT * FROM options WHERE name = ?";
+
+        return jdbcTemplate.query(sqlString,new Object[] { optionKey }, new BeanPropertyRowMapper<Option>(Option.class));
+
+    }
+
+    public SelectResponse getJoinCol(int sheetId,String colName,String query) {
+
+        String sqlString = "SELECT value as id,value as text FROM sheet_data WHERE sheet_id = ? AND name = ? AND value LIKE '%"+query+"%' LIMIT 10";
+
+       // return jdbcTemplate.query(sqlString,new Object[] { sheetId,colName }, new BeanPropertyRowMapper<Option>(Option.class));
+
+        List<SelectOption> results = jdbcTemplate.query(sqlString,new Object[] { sheetId,colName }, new BeanPropertyRowMapper<SelectOption>(SelectOption.class));
+
+        SelectResponse selectResponse = new SelectResponse();
+        selectResponse.setItems(results);
+        selectResponse.setTotal(results.size());
+        return selectResponse;
     }
 }

@@ -8,39 +8,28 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FormValidation {
 
-    private String rrr = "dsa";
-    private HashMap<String, HashMap> field_data = new HashMap<String, HashMap>();
 
 
-    public void setRules(String identifier, String label, String validations){
 
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    public static boolean validate(String col, String rules) {
 
-        //No reason to set rules if we have no POST data
-        if(!"POST".equals(request.getMethod()) || validations.isEmpty()){
-            return;
+        String rule_arr[] = rules.split("\\|");
+
+        //Pattern patronValidity = Pattern.compile("\\[([^\\]]+)]");
+        //Matcher m = p.matcher(in);
+
+        for (String rule: rule_arr){
+
+            if(rule.contains("[") && rule.contains("]") ){
+                System.out.println("With bracket");
+            } else{
+                System.out.println("without bracket");
+            }
         }
-
-
-        HashMap<String, String> fd = new HashMap<String, String>();
-
-
-
-
-
-
-//        System.out.println(identifier);
-//        System.out.println(label);
-//        System.out.println(validations);
-
-
-    }
-
-    public boolean validate() {
-
 //
 //        try {
 //            Method method =  this.getClass().getMethod(validations, null);
@@ -52,8 +41,6 @@ public class FormValidation {
 //        } catch (InvocationTargetException e) {
 //            e.printStackTrace();
 //        }
-
-
         return false;
     }
 

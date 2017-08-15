@@ -25,31 +25,55 @@ public class AjaxController {
     SheetService sheetService;
 
     @ResponseBody
+    @RequestMapping(value="/api/sheet/save", method= RequestMethod.POST)
+    public Boolean getSheetHeader(@RequestParam("rowId") int rowId,
+                                  @RequestParam("colId") String colId,
+                                  @RequestParam("newVal") String newVal) {
+
+
+
+        return sheetService.saveSheet(rowId, colId, newVal);
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value="/api/getOptions", method= RequestMethod.POST)
+    public List<Option> getOptions(@RequestParam("optionKey") String optionKey) {
+        return sheetService.getOptions(optionKey);
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/api/getJoin", method= RequestMethod.POST)
+    public SelectResponse getJoinCol(@RequestParam("sid") int sheetId,
+                                   @RequestParam("q") String query,
+                                   @RequestParam("col") String colName) {
+
+        return sheetService.getJoinCol(sheetId,colName,query);
+    }
+
+
+    @ResponseBody
     @RequestMapping(value="/api/getHeaders", method= RequestMethod.POST)
     public List<MetaData> getSheetHeader() {
-
         return sheetService.getSheetHeader();
-
     }
+
+
+
 
 
 
     @RequestMapping(value="/api/viewDatatable", method= RequestMethod.POST)
     public DatatableResponse getBucket(DatatableRequest datatableRequest) {
 
-
         long startTime = System.nanoTime();
 
-
-       DatatableResponse datatableResponse =  sheetService.getView(datatableRequest);
+        DatatableResponse datatableResponse =  sheetService.getView(datatableRequest);
 
         long endTime = System.nanoTime();
-
         long elapsedTime = endTime - startTime;
         double seconds = (double)elapsedTime / 1000000000.0;
         System.out.println("Took "+seconds + " secs");
-
-
         return datatableResponse;
 
     }
