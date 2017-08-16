@@ -8,6 +8,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,14 +28,9 @@ public class FormValidation {
         String ruleArr[] = rules.split("\\|");
 
         for (String rule: ruleArr){
-
-            //System.out.println(rule);
-
             if(rule.contains("[") && rule.contains("]") ){
-
                 String ruleName = rule.substring(0, rule.indexOf("[")).trim();
                 int ruleVal = Integer.parseInt(rule.substring(rule.indexOf("[") + 1, rule.indexOf("]")));
-
                 try {
                     Method method =  FormValidation.class.getMethod(ruleName, String.class, int.class);
                     response = (AjaxResponse) method.invoke(null, fieldVal, ruleVal);
@@ -46,8 +42,6 @@ public class FormValidation {
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                //System.out.println(ruleVal);
-                //System.out.println("With bracket");
             } else{
 
                 try {
@@ -61,43 +55,84 @@ public class FormValidation {
                 } catch (InvocationTargetException e) {
                 e.printStackTrace();
                 }
-
-
-               // response = required(fieldVal);
-                //if(!response.getStatus()) break;
             }
-
-
-
         }
-
-//
-//        try {
-//            Method method =  this.getClass().getMethod(validations, null);
-//            method.invoke(this, null);
-//        } catch (NoSuchMethodException e) {
-//            e.printStackTrace();
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        } catch (InvocationTargetException e) {
-//            e.printStackTrace();
-//        }
-
         return response;
     }
 
 
-    public static AjaxResponse minLength(String str, int param){
 
-        System.out.println(str);
-        System.out.println(param);
+    public static AjaxResponse greaterThan(String str, int param){
+        AjaxResponse rs = new AjaxResponse();
+
+        int num = Integer.parseInt(str);
+        if(num <= param) {
+            rs.setStatus(false);
+            rs.setMsg("Field must contain a number greater than "+param+".");
+        } else{
+            rs.setStatus(true);
+        }
+        return rs;
+    }
+
+    public static AjaxResponse greaterThanEqualTo(String str, int param){
 
         AjaxResponse rs = new AjaxResponse();
-        if(str.length() < param) {
-            rs.setStatus(true);
+        int num = Integer.parseInt(str);
+        if(num < param) {
+            rs.setStatus(false);
+            rs.setMsg("Field must contain a number greater than or equal to  "+param+".");
         } else{
+            rs.setStatus(true);
+        }
+        return rs;
+    }
+
+    public static AjaxResponse lessThan(String str, int param){
+        AjaxResponse rs = new AjaxResponse();
+
+        int num = Integer.parseInt(str);
+        if(num >= param) {
+            rs.setStatus(false);
+            rs.setMsg("Field must contain a number less than "+param+".");
+        } else{
+            rs.setStatus(true);
+        }
+        return rs;
+    }
+
+    public static AjaxResponse lessThanEqualTo(String str, int param){
+
+        AjaxResponse rs = new AjaxResponse();
+        int num = Integer.parseInt(str);
+        if(num > param) {
+            rs.setStatus(false);
+            rs.setMsg("Field must contain a number less than or equal to  "+param+".");
+        } else{
+            rs.setStatus(true);
+        }
+        return rs;
+    }
+
+
+    public static AjaxResponse minLength(String str, int param){
+        AjaxResponse rs = new AjaxResponse();
+        if(str.length() < param) {
             rs.setStatus(false);
             rs.setMsg("Field must be at least "+param+" characters in length.");
+        } else{
+            rs.setStatus(true);
+        }
+        return rs;
+    }
+
+    public static AjaxResponse maxLength(String str, int param){
+        AjaxResponse rs = new AjaxResponse();
+        if(str.length() > param) {
+            rs.setStatus(false);
+            rs.setMsg("Field cannot exceed "+param+" characters in length.");
+        } else{
+            rs.setStatus(true);
         }
         return rs;
     }
@@ -138,7 +173,7 @@ public class FormValidation {
         return rs;
     }
 
-    public static AjaxResponse valid_email(String str) {
+    public static AjaxResponse validEmail(String str) {
         AjaxResponse rs = new AjaxResponse();
 
         String mylRegExpVar = "[A-Za-z0-9._%+-]{2,}+@[A-Za-z-]{2,}+\\.[A-Za-z]{2,}";
@@ -154,7 +189,43 @@ public class FormValidation {
         return rs;
     }
 
+    public static AjaxResponse validDate(String str) {
+        AjaxResponse rs = new AjaxResponse();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            sdf.parse(str);
+            rs.setStatus(true);
+        }
+        catch(Exception ex) {
+            rs.setStatus(false);
+            rs.setMsg("Not valid Date.");
+        }
+        return rs;
+    }
+
+    public static AjaxResponse validTime(String str) {
+        AjaxResponse rs = new AjaxResponse();
+
+        String mylRegExpVar = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+        Pattern pVar = Pattern.compile(mylRegExpVar);
+        Matcher mVar = pVar.matcher(str);
+
+        if(!mVar.matches()){
+            rs.setStatus(false);
+            rs.setMsg("Not valid time.");
+        } else{
+            rs.setStatus(true);
+        }
+        return rs;
+    }
 
 
+    //min  date
+    //past date
+    //date not later than
+    //fix if string in minLength etc..
+    //fix if null in minlength etc.
+    //reduce program lines
+    //complete for select 2
 
 }
