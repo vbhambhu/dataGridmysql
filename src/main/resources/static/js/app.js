@@ -118,13 +118,13 @@ $.post( "api/getHeaders", function( data ) {
         var html = '';
 
         if(inputType == 'text'){
-            html += '<input type="text" value="'+currentVal+'"  class="cellEdit">';
+            html += '<input type="text" value="'+currentVal+'"  class="cellEdit"><span class="currentVal">'+currentVal+'</span>';
             $(this).html(html);
         } else if(inputType == 'textarea'){
-            html += '<textarea class="cellEdit hidden">'+currentVal+'</textarea>';
+            html += '<textarea class="cellEdit hidden">'+currentVal+'</textarea><span class="currentVal">'+currentVal+'</span>';
             $(this).html(html);
         } else if(inputType == 'date'){
-            html += '<input type="text" value="'+currentVal+'"   class="datepicker">';
+            html += '<input type="text" value="'+currentVal+'"   class="datepicker"><span class="currentVal">'+currentVal+'</span>';
             $(this).html(html);
             $( ".datepicker" ).datepicker({
                 dateFormat: 'dd-mm-yy',
@@ -133,15 +133,15 @@ $.post( "api/getHeaders", function( data ) {
                 }
             }).focus();
         } else if(inputType.indexOf('select') !== -1){
-            html += '<select class="optionSelect" style="width:100%;"></select>';
+            html += '<select class="optionSelect" style="width:100%;"></select><span class="currentVal">'+currentVal+'</span>';
             $(this).html(html);
             initSelect(inputType,currentVal);
         }  else if(inputType.indexOf('join') !== -1){
-            html += '<select class="joinSelect form-control" ></select>';
+            html += '<select class="joinSelect form-control" ></select><span class="currentVal">'+currentVal+'</span>';
             $(this).html(html);
             initJoinSelect(inputType);
         } else if(inputType.indexOf('api') !== -1){
-            html += '<select class="apiSelect form-control"></select>';
+            html += '<select class="apiSelect form-control"></select><span class="currentVal">'+currentVal+'</span>';
             $(this).html(html);
             initapiSelect(inputType);
         }
@@ -166,15 +166,22 @@ $.post( "api/getHeaders", function( data ) {
         var $td = $($elem).closest('td');
         var rowId = parseInt($td.attr('rid'));
         var colId = $td.attr('colid');
+        var oldVal = $($elem).next().text();
+
+        if(newVal.trim() == oldVal.trim()){ // do not save
+            $($elem).remove();
+            $td.text(oldVal);
+            return;
+        }
 
         //Save value here
         $.post( "api/sheet/save", { rowId:rowId , colId: colId, newVal: newVal } , function( response ) {
             $($elem).remove();
-            $td.text(newVal);
-            console.log(response);
             if(response.status){
+                $td.text(newVal);
                 $.notify(response.msg, "success");
             } else{
+                $td.text(oldVal);
                 $.notify(response.msg, "error");
             }
 
