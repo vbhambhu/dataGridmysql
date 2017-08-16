@@ -195,7 +195,7 @@ public class SheetService {
         return metaData;
     }
 
-    public Boolean saveSheet(int rowId, String colId, String newVal) {
+    public AjaxResponse saveSheet(int rowId, String colId, String newVal) {
 
         int sheetId = 1;
 
@@ -204,17 +204,21 @@ public class SheetService {
 
         MetaData metaData = jdbcTemplate.queryForObject(metaSql, new Object[] { sheetId, colId }, new BeanPropertyRowMapper<MetaData>(MetaData.class));
 
-        //System.out.println(metaData.getValidations());
+        AjaxResponse validationResponse = FormValidation.validate(newVal, metaData.getValidations());
 
-        FormValidation.validate(newVal, metaData.getValidations());
+        AjaxResponse response = new AjaxResponse();
 
+        if(validationResponse.getStatus()){ // validated successfully
+            String SQL = "UPDATE sheet_data SET value = ? WHERE sheet_id=? AND record_id = ? AND name=?";
+            jdbcTemplate.update(SQL, newVal,sheetId,rowId,colId );
+            response.setStatus(true);
+            response.setMsg("Saved succeefully");
+        } else{
+            response.setStatus(false);
+            response.setMsg(validationResponse.getMsg());
+        }
 
-        String SQL = "UPDATE sheet_data SET value = ? WHERE sheet_id=? AND record_id = ? AND name=?";
-        jdbcTemplate.update(SQL, newVal,sheetId,rowId,colId );
-
-        return true;
-
-
+        return response;
     }
 
     public List<Option> getOptions(String optionKey) {

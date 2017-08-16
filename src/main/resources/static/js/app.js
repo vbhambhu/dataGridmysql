@@ -171,7 +171,13 @@ $.post( "api/getHeaders", function( data ) {
         $.post( "api/sheet/save", { rowId:rowId , colId: colId, newVal: newVal } , function( response ) {
             $($elem).remove();
             $td.text(newVal);
-           // $.notify("Access granted", "success");
+            console.log(response);
+            if(response.status){
+                $.notify(response.msg, "success");
+            } else{
+                $.notify(response.msg, "error");
+            }
+
         });
 
     }

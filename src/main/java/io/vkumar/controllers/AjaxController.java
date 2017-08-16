@@ -26,11 +26,9 @@ public class AjaxController {
 
     @ResponseBody
     @RequestMapping(value="/api/sheet/save", method= RequestMethod.POST)
-    public Boolean getSheetHeader(@RequestParam("rowId") int rowId,
+    public AjaxResponse saveSheet(@RequestParam("rowId") int rowId,
                                   @RequestParam("colId") String colId,
                                   @RequestParam("newVal") String newVal) {
-
-
 
         return sheetService.saveSheet(rowId, colId, newVal);
     }

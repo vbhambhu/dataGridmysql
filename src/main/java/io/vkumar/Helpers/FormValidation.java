@@ -1,6 +1,7 @@
 package io.vkumar.Helpers;
 
 
+import io.vkumar.entities.AjaxResponse;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -15,7 +16,7 @@ public class FormValidation {
 
 
 
-    public static boolean validate(String col, String rules) {
+    public static AjaxResponse validate(String col, String rules) {
 
         String rule_arr[] = rules.split("\\|");
 
@@ -23,7 +24,6 @@ public class FormValidation {
         //Matcher m = p.matcher(in);
 
         for (String rule: rule_arr){
-
             if(rule.contains("[") && rule.contains("]") ){
                 System.out.println("With bracket");
             } else{
@@ -41,7 +41,9 @@ public class FormValidation {
 //        } catch (InvocationTargetException e) {
 //            e.printStackTrace();
 //        }
-        return false;
+        AjaxResponse response = new AjaxResponse();
+        response.setStatus(true);
+        return response;
     }
 
 
