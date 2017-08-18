@@ -209,8 +209,23 @@ public class SheetService {
         AjaxResponse response = new AjaxResponse();
 
         if(validationResponse.getStatus()){ // validated successfully
-            String SQL = "UPDATE sheet_data SET value = ? WHERE sheet_id=? AND record_id = ? AND name=?";
-            jdbcTemplate.update(SQL, newVal,sheetId,rowId,colId );
+
+
+            String totalSql = "SELECT COUNT(*) from sheet_data WHERE sheet_id=? AND record_id = ? AND name=?";
+            int totalRows = jdbcTemplate.queryForObject(totalSql,new Object[] { sheetId,rowId,colId }, Integer.class);
+
+            if(totalRows == 0){
+                String insertSql = "INSERT into sheet_data (sheet_id, record_id, name,value)  VALUES(?,?,?,?)";
+                jdbcTemplate.update(insertSql, new Object[] {sheetId, rowId, colId, newVal} );
+
+            } else{
+
+                String SQL = "UPDATE sheet_data SET value = ? WHERE sheet_id=? AND record_id = ? AND name=?";
+                jdbcTemplate.update(SQL, newVal,sheetId,rowId,colId );
+
+            }
+
+
             response.setStatus(true);
             response.setMsg("Saved succeefully");
         } else{

@@ -16,44 +16,53 @@ import java.util.regex.Pattern;
 
 public class FormValidation {
 
-
-
-
     public static AjaxResponse validate(String fieldVal, String rules) {
 
         AjaxResponse response = new AjaxResponse();
         response.setStatus(true);
 
+        // if rules are blank
+        if(rules.isEmpty()){
+            return response;
+        }
 
         String ruleArr[] = rules.split("\\|");
 
         for (String rule: ruleArr){
             if(rule.contains("[") && rule.contains("]") ){
                 String ruleName = rule.substring(0, rule.indexOf("[")).trim();
-                int ruleVal = Integer.parseInt(rule.substring(rule.indexOf("[") + 1, rule.indexOf("]")));
-                try {
-                    Method method =  FormValidation.class.getMethod(ruleName, String.class, int.class);
-                    response = (AjaxResponse) method.invoke(null, fieldVal, ruleVal);
-                    if(!response.getStatus()) break;
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+
+                if(ruleName.equals("validDate") || ruleName.equals("validTime")){
+                    String ruleVal =  rule.substring(rule.indexOf("[") + 1, rule.indexOf("]"));
+
+                    try {
+                        Method method =  FormValidation.class.getMethod(ruleName, String.class, String.class);
+                        response = (AjaxResponse) method.invoke(null, fieldVal, ruleVal);
+                        if(!response.getStatus()) break;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                } else{
+                    int ruleVal = Integer.parseInt(rule.substring(rule.indexOf("[") + 1, rule.indexOf("]")));
+
+                    try {
+                        Method method =  FormValidation.class.getMethod(ruleName, String.class, int.class);
+                        response = (AjaxResponse) method.invoke(null, fieldVal, ruleVal);
+                        if(!response.getStatus()) break;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+
             } else{
 
                 try {
                     Method method =  FormValidation.class.getMethod(rule, String.class);
                     response = (AjaxResponse) method.invoke(null, fieldVal);
                     if(!response.getStatus()) break;
-                } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -64,6 +73,12 @@ public class FormValidation {
 
     public static AjaxResponse greaterThan(String str, int param){
         AjaxResponse rs = new AjaxResponse();
+
+        if(!str.matches("-?\\d+(\\.\\d+)?")){
+            rs.setStatus(false);
+            rs.setMsg("Field must have numeric value.");
+            return rs;
+        }
 
         int num = Integer.parseInt(str);
         if(num <= param) {
@@ -78,6 +93,13 @@ public class FormValidation {
     public static AjaxResponse greaterThanEqualTo(String str, int param){
 
         AjaxResponse rs = new AjaxResponse();
+
+        if(!str.matches("-?\\d+(\\.\\d+)?")){
+            rs.setStatus(false);
+            rs.setMsg("Field must have numeric value.");
+            return rs;
+        }
+
         int num = Integer.parseInt(str);
         if(num < param) {
             rs.setStatus(false);
@@ -90,6 +112,12 @@ public class FormValidation {
 
     public static AjaxResponse lessThan(String str, int param){
         AjaxResponse rs = new AjaxResponse();
+
+        if(!str.matches("-?\\d+(\\.\\d+)?")){
+            rs.setStatus(false);
+            rs.setMsg("Field must have numeric value.");
+            return rs;
+        }
 
         int num = Integer.parseInt(str);
         if(num >= param) {
@@ -104,6 +132,13 @@ public class FormValidation {
     public static AjaxResponse lessThanEqualTo(String str, int param){
 
         AjaxResponse rs = new AjaxResponse();
+
+        if(!str.matches("-?\\d+(\\.\\d+)?")){
+            rs.setStatus(false);
+            rs.setMsg("Field must have numeric value.");
+            return rs;
+        }
+
         int num = Integer.parseInt(str);
         if(num > param) {
             rs.setStatus(false);
@@ -189,9 +224,9 @@ public class FormValidation {
         return rs;
     }
 
-    public static AjaxResponse validDate(String str) {
+    public static AjaxResponse validDate(String str, String format) {
         AjaxResponse rs = new AjaxResponse();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
         try {
             sdf.parse(str);
             rs.setStatus(true);
@@ -203,7 +238,7 @@ public class FormValidation {
         return rs;
     }
 
-    public static AjaxResponse validTime(String str) {
+    public static AjaxResponse validTime(String str, String format) {
         AjaxResponse rs = new AjaxResponse();
 
         String mylRegExpVar = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
@@ -220,12 +255,6 @@ public class FormValidation {
     }
 
 
-    //min  date
-    //past date
-    //date not later than
-    //fix if string in minLength etc..
-    //fix if null in minlength etc.
-    //reduce program lines
-    //complete for select 2
+
 
 }

@@ -21,10 +21,10 @@
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-              <a th:href="@{/s}" class="nav-link">Home</a>
+              <a th:href="@{/}" class="nav-link">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Settings</a>
+              <a th:href="@{/sheet?id=1}" class="nav-link">Sheet</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Profile</a>
@@ -37,5 +37,10 @@
     </nav>
 <!-- //top menu -->
 
+
+
+<nav class="col-sm-3 col-md-2 hidden-xs-down sidebar" th:fragment="sidebar">
+    <div id="projectTree"></div>
+</nav>
 </body>
 </html>
